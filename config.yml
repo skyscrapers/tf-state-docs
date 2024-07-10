@@ -1,0 +1,58 @@
+resources:
+  aws_elasticache_replication_group:
+    header: ElastiCache clusters
+    attributes:
+      - primary_endpoint_address
+      - reader_endpoint_address
+      - id
+  aws_db_instance:
+    header: RDS databases
+    attributes:
+      - address
+  aws_rds_cluster:
+    header: Aurora clusters
+    attributes:
+      - endpoint
+      - reader_endpoint
+      - id
+  aws_sqs_queue:
+    header: SQS Queues
+    attributes:
+      - url
+      - id
+  aws_s3_bucket:
+    header: S3 buckets
+    attributes: []
+  aws_iam_role:
+    header: IAM role
+    attributes:
+      - arn
+  aws_iam_user:
+    header: IAM user
+    attributes:
+      - id
+      - arn
+  kubernetes_service_account:
+    header: Service Account
+    attributes:
+      - id
+  aws_ecr_repository:
+    header: ECR repository
+    attributes:
+      - repository_url
+      - mutable_url
+  aws_sns_topic:
+    header: SNS topic
+    attributes:
+      - name
+  aws_cloudfront_distribution:
+    header: Cloudfront
+    attributes:
+      - id
+  # kubernetes_secret:
+  #   header: Secrets
+  #   attributes:
+  kubernetes_config_map:
+    header: Config map
+    attributes:
+      - id
