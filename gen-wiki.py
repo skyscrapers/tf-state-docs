@@ -8,16 +8,6 @@ import shutil
 
 TEMP_DIR = 'temp_wiki'
 
-HOMEPAGE_CONTENT = """
-# Welcome to {repo_name} terragrunt Wiki
-
-## Introduction
-Welcome to the official wiki for the **{repo_name}** project. Here you will find all the necessary documentation to understand and contribute to the project.
-
-## Table of Contents
-{toc}
-"""
-
 def load_config(config_file):
     with open(config_file, 'r') as f:
         config = yaml.safe_load(f)
@@ -113,18 +103,6 @@ def process_environment(environment, config, output_dir):
             f.write(markdown_content)
         print(f"Markdown file generated for {environment}: {output_file}")
 
-def process_shared_ecr(shared_dir, config, output_dir):
-    ecr_dir = os.path.join(shared_dir, 'ecr')
-    if os.path.isdir(ecr_dir):
-        markdown_content = f"# Shared ECR\n\n"
-        content = process_directory(ecr_dir, config)
-        if content:
-            markdown_content += content
-            output_file = os.path.join(output_dir, 'ecr.md')
-            with open(output_file, 'w') as f:
-                f.write(markdown_content)
-            print(f"Markdown file generated for shared ECR: {output_file}")
-
 def list_md_files(directory):
     """List all .md files in a given directory."""
     md_files = []
@@ -133,31 +111,6 @@ def list_md_files(directory):
             if file.endswith('.md'):
                 md_files.append(os.path.join(root, file))
     return md_files
-
-def generate_sidebar_content(md_files):
-    """Generate sidebar content from a list of markdown files."""
-    sidebar_content = "# Sidebar\n\n - [Home](home)\n"
-    for md_file in md_files:
-        filename = os.path.basename(md_file)
-        name, _ = os.path.splitext(filename)
-        sidebar_content += f"- [{name}]({name})\n"
-    return sidebar_content
-
-def generate_homepage_content(repo_name, md_files):
-    """Generate home page content from a list of markdown files."""
-    toc = ""
-    for md_file in md_files:
-        filename = os.path.basename(md_file)
-        name, _ = os.path.splitext(filename)
-        toc += f"- [{name}]({name})\n"
-    return HOMEPAGE_CONTENT.format(repo_name=repo_name, toc=toc)
-
-def create_sidebar_and_homepage(temp_dir, repo_name, md_files):
-    """Create a custom sidebar and a stylish home page."""
-    homepage_content = generate_homepage_content(repo_name, md_files)
-
-    with open(os.path.join(temp_dir, 'Home.md'), 'w', encoding='utf-8') as file:
-        file.write(homepage_content)
 
 def copy_wiki(md_files):
     for md_file in md_files:
@@ -189,5 +142,4 @@ if __name__ == "__main__":
 
     md_files = list_md_files(args.output_dir)
     os.chdir("../..")
-    create_sidebar_and_homepage(TEMP_DIR, args.repo_name, md_files)
     copy_wiki(md_files)
