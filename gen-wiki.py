@@ -175,8 +175,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Extract secrets using terragrunt state pull based on a YAML configuration.')
     parser.add_argument('config_file', help='Path to the YAML configuration file')
     parser.add_argument('output_dir', help='Path to the output directory')
-    parser.add_argument('repo_name', help='Name of the repo you want to create a doc for')
-    parser.add_argument('--environments', nargs='+', default=['development', 'production', 'test', 'staging'], help='Environments to process')
+    parser.add_argument('--repo_name', default=os.getenv("REPO_NAME"), help='Name of the repo you want to create a doc for')
     parser.add_argument('--shared_dir', default='shared', help='Directory for shared resources')
 
     args = parser.parse_args()
