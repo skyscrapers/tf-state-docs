@@ -1,0 +1,6 @@
+name: Run docker container
+runs:
+  using: 'docker'
+  image: 'docker://skyscrapers/tf-state-docs:latest'
+  args:
+    - ${{ inputs.repo_name }}
