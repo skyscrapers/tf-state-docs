@@ -1,5 +1,5 @@
 FROM python:3.12
-ADD . .
+ADD . /github/workspace/
 
 ENV REPO_NAME="toto"
 
