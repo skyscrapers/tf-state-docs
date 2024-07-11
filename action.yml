@@ -2,5 +2,5 @@ name: Run docker container
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/skyscrapers/tf-state-docs:latest'
-  args:
-    - ${{ inputs.repo_name }}
+  env:
+    REPO_NAME: ${{ inputs.repo_name }}
