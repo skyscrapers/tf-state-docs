@@ -15,4 +15,4 @@ COPY --from=ghcr.io/skyscrapers/terragrunt:opentofu_v1.6.2 /usr/local/bin/tofu /
 COPY --from=ghcr.io/skyscrapers/terragrunt:opentofu_v1.6.2 /usr/local/bin/terragrunt /usr/local/bin/terragrunt
 
 #Code execution
-ENTRYPOINT [ "python", "/usr/bin/gen-wiki.py", "/config.yml", "output/", "$REPO_NAME" ]
+ENTRYPOINT [ "python", "/usr/bin/gen-wiki.py", "/config.yml", "output/", $REPO_NAME ]
