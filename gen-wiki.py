@@ -62,7 +62,9 @@ def run_terragrunt(directory):
         print(f"Directory = ", directory)
         return result.stdout
     except subprocess.CalledProcessError as e:
-        print(f"Error: ", e.stdout)
+        print(f"Error: {e}")
+        print(f"Command output: {e.stdout}")
+        print(f"Command error output: {e.stderr}")
         return None
 
 def process_directory(directory, config):
