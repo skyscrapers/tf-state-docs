@@ -58,12 +58,11 @@ def generate_markdown_table(header, data):
 
 def run_terragrunt(directory):
     try:
-        result = subprocess.run(['terragrunt', 'state', 'pull'], cwd=directory, check=True, capture_output=True, text=True)
+        result = subprocess.run(['terragrunt', 'state', 'pull', '--terragrunt-source-update'], cwd=directory, check=True, capture_output=True, text=True)
         print(f"Directory = ", directory)
         return result.stdout
     except subprocess.CalledProcessError as e:
         print(f"Error: ", e)
-        print(f"Error Directory = ", directory)
         return None
 
 def process_directory(directory, config):
