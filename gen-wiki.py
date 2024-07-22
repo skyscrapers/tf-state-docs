@@ -16,7 +16,8 @@ def load_config(config_file):
 
 def load_json(json_content):
     try:
-        return json.loads(json_content)
+        json_deru_load = json.loads(json_content)
+        return json_deru_load
     except subprocess.CalledProcessError as e:
         return "none"
 
@@ -84,8 +85,9 @@ def extract_repo_name(file_path):
     
 def download_bucket(directory):
     s3 = boto3.client('s3')
-    print(f"os.getcwd = ", directory)
+    print(f"directory = ", directory)
     bucket_name = "terraform-remote-state-" + extract_repo_name("terragrunt.hcl")
+    print(f"bucket_name = ", bucket_name)
     try:
         s3.download_file(bucket_name, directory, "tmp_file.json")
         return "tmp_file.json"
