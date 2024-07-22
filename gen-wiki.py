@@ -2,9 +2,10 @@ import os
 import re
 import yaml
 import json
+import boto3
+import shutil
 import argparse
 import subprocess
-import shutil
 
 TEMP_DIR = 'temp_wiki'
 
@@ -66,9 +67,31 @@ def run_terragrunt(directory):
         print(f"Command output: {e.stdout}")
         print(f"Command error output: {e.stderr}")
         return None
+    
+def extract_after_live(s):
+    index = s.index('live/') + len('live/')
+    return s[index:]
+
+def extract_repo_name(file_path):
+    with open(file_path, 'r') as file:
+        for line in file:
+            if "customer_name =" in line:
+                customer_name = line.split('=', 1)[1].strip().strip('"')
+                return customer_name
+    
+def download_bucket():
+    s3 = boto3.client('s3')
+    object_key = extract_after_live(os.getcwd())
+    bucket_name = "terraform-remote-state-" + extract_repo_name("terragrunt.hcl")
+    try:
+        s3.download_file(bucket_name, object_key, "tmp_file.json")
+        return "tmp_file.json"
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
 
 def process_directory(directory, config):
-    json_content = run_terragrunt(directory)
+    json_content = download_bucket(directory)
     if not json_content:
         return None
 
