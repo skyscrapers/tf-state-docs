@@ -91,7 +91,7 @@ def download_bucket():
         return None
 
 def process_directory(directory, config):
-    json_content = download_bucket(directory)
+    json_content = download_bucket()
     if not json_content:
         return None
 
