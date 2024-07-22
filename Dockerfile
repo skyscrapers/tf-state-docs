@@ -8,7 +8,8 @@ ENV REPO_NAME="toto"
 RUN apt-get update && \
     apt-get install -y jq && \
     python -m pip install --upgrade pip && \
-    pip install pyaml
+    pip install pyaml \
+    pip install boto3
 
 COPY --from=ghcr.io/skyscrapers/terragrunt:opentofu_v1.6.2 /usr/local/bin/sops /usr/local/bin/sops
 COPY --from=ghcr.io/skyscrapers/terragrunt:opentofu_v1.6.2 /usr/local/bin/tofu /usr/local/bin/tofu
