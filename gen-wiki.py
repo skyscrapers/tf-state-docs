@@ -13,14 +13,6 @@ def load_config(config_file):
     with open(config_file, 'r') as f:
         config = yaml.safe_load(f)
     return config
-
-def load_json(json_content):
-    try:
-        json_deru_load = json.loads(json_content)
-        return json_deru_load
-    except subprocess.CalledProcessError as e:
-        print(f"Error: {e}")
-        return None
     
 def read_json_file(file_path):
     try:
@@ -30,16 +22,6 @@ def read_json_file(file_path):
     except Exception as e:
         print(f"Error reading file: {e}")
         return None
-
-def remove_aws_provider_profile(file_name):
-    search_pattern = r'aws_profile\s*=\s*".*?"'
-    replace_pattern = 'aws_profile   = ""'
-
-    with open(file_name, 'r') as file:
-        content = file.read()
-    new_content = re.sub(search_pattern, replace_pattern, content)
-    with open(file_name, 'w') as file:
-        file.write(new_content)
 
 def extract_attributes(data, resource_type, attributes):
     extracted_data = []
@@ -70,21 +52,6 @@ def generate_markdown_table(header, data):
 
     table += "\n"
     return table
-
-def run_terragrunt(directory):
-    try:
-        result = subprocess.run(['terragrunt', 'state', 'pull', '--terragrunt-source-update'], cwd=directory, check=True, capture_output=True, text=True)
-        print(f"Directory = ", directory)
-        return result.stdout
-    except subprocess.CalledProcessError as e:
-        print(f"Error: {e}")
-        print(f"Command output: {e.stdout}")
-        print(f"Command error output: {e.stderr}")
-        return None
-    
-def extract_after_live(s):
-    index = s.index('live/') + len('live/')
-    return s[index:]
 
 def extract_repo_name(file_path):
     with open(file_path, 'r') as file:
@@ -156,14 +123,6 @@ def copy_wiki(md_files):
     for md_file in md_files:
         subprocess.run(['cp', "terraform/live/" + md_file, 'temp_wiki'], check=True)
 
-def clean_up_directory(directory_list):
-    os.chdir("..")
-    for directory in directory_list:
-        try:
-            shutil.rmtree(directory)
-        except Exception as e:
-            print(f"{e}")
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Extract secrets using terragrunt state pull based on a YAML configuration.')
     parser.add_argument('config_file', help='Path to the YAML configuration file')
@@ -175,7 +134,6 @@ if __name__ == "__main__":
 
     config = load_config(args.config_file)
     os.chdir("terraform/live")
-    remove_aws_provider_profile("terragrunt.hcl")
     directories = [d for d in os.listdir(os.getcwd()) if os.path.isdir(os.path.join(os.getcwd(), d))]
     for directory in directories:
         process_environment(directory, config, args.output_dir)
