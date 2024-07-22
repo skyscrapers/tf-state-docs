@@ -15,7 +15,10 @@ def load_config(config_file):
     return config
 
 def load_json(json_content):
-    return json.loads(json_content)
+    try:
+        return json.loads(json_content)
+    except subprocess.CalledProcessError as e:
+        return "none"
 
 def remove_aws_provider_profile(file_name):
     search_pattern = r'aws_profile\s*=\s*".*?"'
