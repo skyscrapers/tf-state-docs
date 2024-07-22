@@ -19,7 +19,17 @@ def load_json(json_content):
         json_deru_load = json.loads(json_content)
         return json_deru_load
     except subprocess.CalledProcessError as e:
-        return "none"
+        print(f"Error: {e}")
+        return None
+    
+def read_json_file(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+            return data
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        return None
 
 def remove_aws_provider_profile(file_name):
     search_pattern = r'aws_profile\s*=\s*".*?"'
@@ -87,7 +97,6 @@ def download_bucket(directory):
     s3 = boto3.client('s3')
     print(f"directory = ", directory)
     bucket_name = "terraform-remote-state-" + extract_repo_name("terragrunt.hcl")
-    print(f"bucket_name = ", bucket_name)
     try:
         s3.download_file(bucket_name, directory, "tmp_file.json")
         return "tmp_file.json"
@@ -100,7 +109,7 @@ def process_directory(directory, config):
     if not json_content:
         return None
 
-    data = load_json(json_content)
+    data = read_json_file(json_content)
     markdown_content = ""
 
     for resource_type, settings in config.get('resources', {}).items():
