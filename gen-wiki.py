@@ -89,7 +89,7 @@ def extract_after_live(s):
 def extract_repo_name(file_path):
     with open(file_path, 'r') as file:
         for line in file:
-            if "customer_name =" in line:
+            if "customer_name" in line:
                 customer_name = line.split('=', 1)[1].strip().strip('"')
                 return customer_name
     
