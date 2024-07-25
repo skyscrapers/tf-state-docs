@@ -1,9 +1,7 @@
 import os
-import re
 import yaml
 import json
 import boto3
-import shutil
 import argparse
 import subprocess
 
@@ -120,8 +118,10 @@ def list_md_files(directory):
     return md_files
 
 def copy_wiki(md_files):
+    if not os.path.exists('temp_wiki/documentation/IaC'):
+        os.makedirs('temp_wiki/documentation/IaC')
     for md_file in md_files:
-        subprocess.run(['cp', "terraform/live/" + md_file, 'temp_wiki'], check=True)
+        subprocess.run(['cp', "terraform/live/" + md_file, 'temp_wiki/documentation/IaC'], check=True)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Extract secrets using terragrunt state pull based on a YAML configuration.')
