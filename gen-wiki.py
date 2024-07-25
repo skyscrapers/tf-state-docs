@@ -92,7 +92,6 @@ def process_directory(directory, config):
     return markdown_content
 
 def process_environment(environment, config, output_dir):
-    markdown_content = f"# {environment.capitalize()} Environment\n\n"
     for root, dirs, files in os.walk(environment):
         if '.terragrunt-cache' in root:
             continue
@@ -102,7 +101,7 @@ def process_environment(environment, config, output_dir):
             markdown_content += content
 
     if markdown_content.strip() != f"# {environment.capitalize()} Environment\n\n":
-        output_file = os.path.join(output_dir, f"{environment}.md")
+        output_file = os.path.join(output_dir, f"{environment.capitalize()}-environment.md")
         os.makedirs(output_dir, exist_ok=True)
         with open(output_file, 'w') as f:
             f.write(markdown_content)
@@ -118,10 +117,8 @@ def list_md_files(directory):
     return md_files
 
 def copy_wiki(md_files):
-    if not os.path.exists('temp_wiki/documentation/IaC'):
-        os.makedirs('temp_wiki/documentation/IaC')
     for md_file in md_files:
-        subprocess.run(['cp', "terraform/live/" + md_file, 'temp_wiki/documentation/IaC'], check=True)
+        subprocess.run(['cp', "terraform/live/" + md_file, 'temp_wiki'], check=True)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Extract secrets using terragrunt state pull based on a YAML configuration.')

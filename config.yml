@@ -49,9 +49,10 @@ resources:
     header: Cloudfront
     attributes:
       - id
-  # kubernetes_secret:
-  #   header: Secrets
-  #   attributes:
+  kubernetes_secret:
+    header: Secrets
+    attributes:
+      - id
   kubernetes_config_map:
     header: Config map
     attributes:
