@@ -92,6 +92,7 @@ def process_directory(directory, config):
     return markdown_content
 
 def process_environment(environment, config, output_dir):
+    markdown_content = ""
     for root, dirs, files in os.walk(environment):
         if '.terragrunt-cache' in root:
             continue
