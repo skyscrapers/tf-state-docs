@@ -45,7 +45,7 @@ def generate_markdown_table(header, data):
     table += "| " + " | ".join(['---'] * len(headers)) + " |\n"
 
     for item in data:
-        row = "| " + " | ".join(str(item.get(h, '')) for h in headers) + " |\n"
+        row = "| " + " | ".join(f"`{str(item.get(h, ''))}`" for h in headers) + " |\n"
         table += row
 
     table += "\n"
