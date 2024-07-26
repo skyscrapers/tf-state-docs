@@ -12,9 +12,10 @@ resources:
   aws_rds_cluster:
     header: Aurora clusters
     attributes:
+      - cluster_identifier
       - endpoint
       - reader_endpoint
-      - id
+      - engine
   aws_sqs_queue:
     header: SQS Queues
     attributes:
@@ -40,7 +41,7 @@ resources:
     header: ECR repository
     attributes:
       - repository_url
-      - mutable_url
+      - image_tag_mutability
   aws_sns_topic:
     header: SNS topic
     attributes:
@@ -48,6 +49,7 @@ resources:
   aws_cloudfront_distribution:
     header: Cloudfront
     attributes:
+      - name
       - id
   kubernetes_secret:
     header: Secrets
@@ -57,3 +59,40 @@ resources:
     header: Config map
     attributes:
       - id
+  mongodbatlas_cluster:
+    header: MongoDB Atlas cluster
+    attributes:
+      - name
+      - mongo_uri_with_options
+  aws_dynamodb_table:
+    header: DynamoDB table
+    attributes:
+      - id
+      - arn
+  aws_wafv2_web_acl:
+    header: WAF
+    attributes:
+      - name
+      - arn
+  aws_msk_cluster:
+    header: MSK cluster
+    attributes:
+      - cluster_name
+      - arn
+      - bootstrap_brokers_tls
+  aws_cloudwatch_log_group:
+    header: Cloudwatch log group
+    attributes:
+      - name
+      - arn
+  aws_lambda_function:
+    header: Lambda function
+    attributes:
+      - function_name
+      - arn
+  aws_elasticsearch_domain:
+    header: Elasticsearch domain
+    attributes:
+      - domain_name
+      - endpoint
+      - kibana_endpoint

@@ -86,8 +86,7 @@ def process_directory(directory, config):
             markdown_content += table
 
     if markdown_content:
-        module_name = os.path.basename(directory)
-        markdown_content = f"## {module_name.capitalize()}\n\n" + markdown_content
+        markdown_content = f"## {directory.capitalize()}\n\n" + markdown_content
 
     return markdown_content
 
