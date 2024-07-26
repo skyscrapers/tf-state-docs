@@ -2,9 +2,10 @@ resources:
   aws_elasticache_replication_group:
     header: ElastiCache clusters
     attributes:
+      - id
       - primary_endpoint_address
       - reader_endpoint_address
-      - id
+      - member_clusters
   aws_db_instance:
     header: RDS databases
     attributes:
@@ -49,8 +50,8 @@ resources:
   aws_cloudfront_distribution:
     header: Cloudfront
     attributes:
-      - name
       - id
+      - aliases
   kubernetes_secret:
     header: Secrets
     attributes:
