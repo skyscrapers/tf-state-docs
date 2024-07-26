@@ -86,6 +86,7 @@ def process_directory(directory, config):
             markdown_content += table
 
     if markdown_content:
+        directory = directory.split('/', 1)[1]
         markdown_content = f"## {directory.capitalize()}\n\n" + markdown_content
 
     return markdown_content
