@@ -106,7 +106,7 @@ def process_environment(environment, config, output_dir):
                 with open(os.path.join(root, file), 'r') as f:
                     content = f.read()
                     if content.strip():
-                        markdown_content += f"## Custom Data\n\n"
+                        markdown_content += f"## Docs\n\n"
                         markdown_content += content
 
     if markdown_content.strip() != f"# {environment.capitalize()} Environment\n\n":
