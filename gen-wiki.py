@@ -101,6 +101,14 @@ def process_environment(environment, config, output_dir):
         if content:
             markdown_content += content
 
+        for file in files:
+            if file.endswith('.md') and '.terragrunt-cache' in root:
+                with open(os.path.join(root, file), 'r') as f:
+                    content = f.read()
+                    if content.strip():
+                        markdown_content += f"## Custom Data\n\n"
+                        markdown_content += content
+
     if markdown_content.strip() != f"# {environment.capitalize()} Environment\n\n":
         output_file = os.path.join(output_dir, f"{environment.capitalize()}-environment.md")
         os.makedirs(output_dir, exist_ok=True)
