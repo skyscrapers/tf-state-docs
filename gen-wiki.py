@@ -102,7 +102,7 @@ def process_environment(environment, config, output_dir):
             markdown_content += content
 
         for file in files:
-            if file.endswith('.md') in root:
+            if file.endswith('.md'):
                 with open(os.path.join(root, file), 'r') as f:
                     content = f.read()
                     if content.strip():
