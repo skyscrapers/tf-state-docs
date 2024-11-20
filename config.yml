@@ -10,6 +10,7 @@ resources:
     header: RDS databases
     attributes:
       - address
+      - endpoint
       - engine
   aws_rds_cluster:
     header: Aurora clusters
