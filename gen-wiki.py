@@ -16,6 +16,7 @@ def create_modules_documentation(output_dir):
                 with open(os.path.join(root, file), 'r') as f:
                     content = f.read()
                     if content.strip():
+                        directory = root.split('/', 2)[2]
                         markdown_content += f"## {directory.capitalize()}\n\n"
                         markdown_content += content
 
