@@ -5,20 +5,63 @@ import boto3
 import argparse
 import subprocess
 
-TEMP_DIR = 'temp_wiki'
+MODULES_NAME = []
+
+def check_next_module_name(curent_name, next_name):
+    curent = curent_name.split('-')
+    second = next_name.split('-')
+    if curent[0] == second[0]:
+        return True
+    return False
+
+def compare_directory_names(directory_names):
+    matching_directories = []
+    for i in range(len(directory_names)):
+        for j in range(i+1, len(directory_names)):
+            if check_next_module_name(directory_names[i], directory_names[j]):
+                matching_directories.append((directory_names[i], directory_names[j]))
+    return matching_directories
+
+def process_files(module_dir, directory):
+    files = os.listdir(f"{module_dir}/{directory}")
+    for file in files:
+        if file.endswith('.md'):
+            return f"{module_dir}/{directory}/{file}"
+        
+def remove_module_from_list(module_list, module_to_remove):
+    clean_least = [i for i in module_list if i not in module_to_remove]
+    return clean_least
+
+def create_str_for_multiple_modules(paths, module_name, module_full_name):
+    content = ""
+    content += f"## {module_name.capitalize()}\n\n"
+    for path in paths:
+        with open(path, 'r') as f:
+            tmp = f.read()
+            if tmp.strip():
+                content += f"### {module_full_name.capitalize()}\n\n"
+                content += tmp
+    MODULES_NAME.append(module_name)
+    return content
 
 def create_modules_documentation(output_dir):
     modules_dir = 'terraform/modules'
     markdown_content = ""
-    for root, _, files in os.walk(modules_dir):
-        for file in files:
-            if file.endswith('.md'):
-                with open(os.path.join(root, file), 'r') as f:
-                    content = f.read()
-                    if content.strip():
-                        directory = root.split('/', 2)[2]
-                        markdown_content += f"## {directory.capitalize()}\n\n"
-                        markdown_content += content
+    paths = []
+    directory_names = [d for d in os.listdir(modules_dir) if os.path.isdir(os.path.join(modules_dir, d))]
+    multiple_directory = compare_directory_names(directory_names)
+    if multiple_directory is not None:
+        for module in multiple_directory:
+            paths.append(process_files(modules_dir, module[0]))
+            paths.append(process_files(modules_dir, module[1]))
+    markdown_content += create_str_for_multiple_modules(paths, multiple_directory[0][0].split('-')[0], multiple_directory[0][0])
+    directory_names = remove_module_from_list(directory_names, multiple_directory[0])
+    for directory in directory_names:
+        tmp = process_files(modules_dir, directory)
+        if tmp != None:
+            markdown_content += f"## {directory.capitalize()}\n\n"
+            markdown_content += tmp
+            MODULES_NAME.append(directory)
 
     if markdown_content.strip() != f"#TMP\n\n":
         output_file = os.path.join(output_dir, f"modules-documentation.md")
@@ -88,6 +131,10 @@ def download_bucket(directory):
     except Exception as e:
         print(f"Error: {e}")
         return None
+    
+def create_link_to_module_doc(module_name):
+    content = f"Module documentation [here](https://github.com/skyscrapers/{os.getenv('REPO_NAME')}/wiki/modules-documentation#{module_name})\n"
+    return content
 
 def process_directory(directory, config):
     json_content = download_bucket(directory)
@@ -107,7 +154,10 @@ def process_directory(directory, config):
 
     if markdown_content:
         directory = directory.split('/', 1)[1]
-        markdown_content = f"## {directory.capitalize()}\n\n" + markdown_content
+        markdown_content = f"## {directory.capitalize()}\n\n"
+        if directory in MODULES_NAME:
+            markdown_content += create_link_to_module_doc(directory)
+        markdown_content += markdown_content
 
     return markdown_content
 
