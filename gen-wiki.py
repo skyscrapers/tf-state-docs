@@ -51,10 +51,12 @@ def create_modules_documentation(output_dir):
     directory_names = [d for d in os.listdir(modules_dir) if os.path.isdir(os.path.join(modules_dir, d))]
     multiple_directory = compare_directory_names(directory_names)
     if multiple_directory is not None:
+        print(multiple_directory)
         for module in multiple_directory:
             paths.append(process_files(modules_dir, module[0]))
             paths.append(process_files(modules_dir, module[1]))
-        markdown_content += create_str_for_multiple_modules(paths, multiple_directory[0][0].split('-')[0], multiple_directory[0][0])
+        paths_filtered = [path for path in paths if path is not None]
+        markdown_content += create_str_for_multiple_modules(paths_filtered, multiple_directory[0][0].split('-')[0], multiple_directory[0][0])
         directory_names = remove_module_from_list(directory_names, multiple_directory[0])
     for directory in directory_names:
         tmp = process_files(modules_dir, directory)
