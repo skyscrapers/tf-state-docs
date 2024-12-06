@@ -213,6 +213,7 @@ if __name__ == "__main__":
     directories = [d for d in os.listdir(os.getcwd()) if os.path.isdir(os.path.join(os.getcwd(), d))]
     for directory in directories:
         process_environment(directory, config, args.output_dir)
+    print("for loop ended")
     
     md_files = list_md_files(args.output_dir)
     os.chdir("../..")
