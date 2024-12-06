@@ -51,7 +51,6 @@ def create_modules_documentation(output_dir):
     directory_names = [d for d in os.listdir(modules_dir) if os.path.isdir(os.path.join(modules_dir, d))]
     multiple_directory = compare_directory_names(directory_names)
     if multiple_directory is not None:
-        print(multiple_directory)
         for module in multiple_directory:
             paths.append(process_files(modules_dir, module[0]))
             paths.append(process_files(modules_dir, module[1]))
@@ -210,14 +209,13 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    create_modules_documentation(args.output_dir)
+    create_modules_documentation(f"terraform/live/{args.output_dir}")
     md_files = list_md_files(args.output_dir)
     config = load_config(args.config_file)
     os.chdir("terraform/live")
     directories = [d for d in os.listdir(os.getcwd()) if os.path.isdir(os.path.join(os.getcwd(), d))]
     for directory in directories:
         process_environment(directory, config, args.output_dir)
-    print("for loop ended")
     
     md_files += list_md_files(args.output_dir)
     os.chdir("../..")
