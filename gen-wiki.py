@@ -210,13 +210,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     create_modules_documentation(f"terraform/live/{args.output_dir}")
-    md_files = list_md_files(args.output_dir)
     config = load_config(args.config_file)
     os.chdir("terraform/live")
     directories = [d for d in os.listdir(os.getcwd()) if os.path.isdir(os.path.join(os.getcwd(), d))]
     for directory in directories:
         process_environment(directory, config, args.output_dir)
     
-    md_files += list_md_files(args.output_dir)
+    md_files = list_md_files(args.output_dir)
     os.chdir("../..")
     copy_wiki(md_files)
