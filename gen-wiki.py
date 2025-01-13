@@ -53,7 +53,7 @@ def create_modules_documentation(output_dir):
     modules_dir = '../modules'
     markdown_content = ""
 
-    output_file = os.path.join(output_dir, f"modules-documentation.md")
+    output_file = os.path.join(output_dir, f"Modules-documentation.md")
     os.makedirs(output_dir, exist_ok=True)
 
     directory_names = [d for d in os.listdir(modules_dir) if os.path.isdir(os.path.join(modules_dir, d))]
