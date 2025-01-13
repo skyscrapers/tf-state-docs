@@ -4,23 +4,24 @@ import json
 import boto3
 import argparse
 import subprocess
+from collections import defaultdict
 
 MODULES_NAME = []
 
-def check_next_module_name(curent_name, next_name):
-    curent = curent_name.split('-')
-    second = next_name.split('-')
-    if curent[0] == second[0]:
-        return True
-    return False
-
 def compare_directory_names(directory_names):
-    matching_directories = []
-    for i in range(len(directory_names)):
-        for j in range(i+1, len(directory_names)):
-            if check_next_module_name(directory_names[i], directory_names[j]):
-                matching_directories.append((directory_names[i], directory_names[j]))
+    # Create a defaultdict to store matching directory groups
+    grouped_directories = defaultdict(list)
+    
+    # Iterate through each directory name and extract the base directory name
+    for directory in directory_names:
+        parts = directory.split('-')
+        base_name = parts[0]  # Assume the base directory name is the last part
+        grouped_directories[base_name].append(directory)
+    
+    # Create the result list in the required format
+    matching_directories = [{base_name: dirs} for base_name, dirs in grouped_directories.items()]
     return matching_directories
+
 
 def process_files(module_dir, directory):
     files = os.listdir(f"{module_dir}/{directory}")
@@ -34,43 +35,45 @@ def remove_module_from_list(module_list, module_to_remove):
 
 def create_str_for_multiple_modules(paths, module_name, module_full_name):
     content = ""
-    content += f"## {module_name.capitalize()}\n\n"
-    for path in paths:
-        with open(path, 'r') as f:
-            tmp = f.read()
-            if tmp.strip():
-                content += f"### {module_full_name.capitalize()}\n\n"
-                content += tmp
+    print(module_name)
+    if any(paths):
+      content += f"## {module_name.capitalize()}\n\n"
+    for index, path in enumerate(paths):
+        if path != None:
+          with open(path, 'r') as f:
+              tmp = f.read()
+              if tmp.strip():
+                  content += f"### {module_full_name[index].capitalize()}\n\n"
+                  tmp = tmp.replace("# ", "#### ",)
+                  content += tmp
     MODULES_NAME.append(module_name)
     return content
 
 def create_modules_documentation(output_dir):
     modules_dir = '../modules'
     markdown_content = ""
-    paths = []
-    print("create module doc: ", os.getcwd())
+
+    output_file = os.path.join(output_dir, f"modules-documentation.md")
+    os.makedirs(output_dir, exist_ok=True)
+
     directory_names = [d for d in os.listdir(modules_dir) if os.path.isdir(os.path.join(modules_dir, d))]
     multiple_directory = compare_directory_names(directory_names)
-    if multiple_directory is not None:
-        for module in multiple_directory:
-            paths.append(process_files(modules_dir, module[0]))
-            paths.append(process_files(modules_dir, module[1]))
-        paths_filtered = [path for path in paths if path is not None]
-        markdown_content += create_str_for_multiple_modules(paths_filtered, multiple_directory[0][0].split('-')[0], multiple_directory[0][0])
-    directory_names = remove_module_from_list(directory_names, multiple_directory[0])
-    for directory in directory_names:
-        tmp = process_files(modules_dir, directory)
-        if tmp != None:
-            markdown_content += f"## {directory.capitalize()}\n\n"
-            markdown_content += tmp
-            MODULES_NAME.append(directory)
 
-    if markdown_content.strip() != f"#TMP\n\n":
-        output_file = os.path.join(output_dir, f"modules-documentation.md")
-        os.makedirs(output_dir, exist_ok=True)
-        with open(output_file, 'w') as f:
-            f.write(markdown_content)
-        print(f"Markdown file generated for modules: {output_file}")
+    for modules in multiple_directory:
+      paths = []
+      for module, directories in modules.items():
+          for directory in directories:
+              paths.append(process_files(modules_dir, directory))
+      
+
+      if paths.__len__() > 1:
+        print(paths, module, directories)
+        markdown_content += create_str_for_multiple_modules(paths, module, directories)
+
+      with open(output_file, 'w') as f:
+          f.write(markdown_content)
+      print(f"Markdown file generated for module: {module}")
+
 
 def load_config(config_file):
     with open(config_file, 'r') as f:
@@ -125,7 +128,6 @@ def extract_repo_name(file_path):
     
 def download_bucket(directory):
     s3 = boto3.client('s3')
-    print(f"directory = ", directory)
     bucket_name = "terraform-remote-state-" + extract_repo_name("terragrunt.hcl")
     try:
         s3.download_file(bucket_name, directory, "tmp_file.json")
@@ -165,8 +167,6 @@ def process_directory(directory, config):
 
 def process_environment(environment, config, output_dir):
     markdown_content = ""
-    print("process environment: ", os.getcwd())
-    print("environment: ", environment)
     for root, dirs, files in os.walk(f"{environment}"):
         if '.terragrunt-cache' in root:
             continue
@@ -180,7 +180,7 @@ def process_environment(environment, config, output_dir):
                 with open(os.path.join(root, file), 'r') as f:
                     content = f.read()
                     if content.strip():
-                        markdown_content += f"### Docs\n\n"
+                        markdown_content += f"\n### Docs\n\n"
                         markdown_content += content
 
     if markdown_content.strip() != f"# {environment.capitalize()} Environment\n\n":
