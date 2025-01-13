@@ -74,7 +74,6 @@ def create_modules_documentation(output_dir):
           f.write(markdown_content)
       print(f"Markdown file generated for module: {module}")
 
-
 def load_config(config_file):
     with open(config_file, 'r') as f:
         config = yaml.safe_load(f)
@@ -135,10 +134,6 @@ def download_bucket(directory):
     except Exception as e:
         print(f"Error: {e}")
         return None
-    
-def create_link_to_module_doc(module_name):
-    content = f"Module documentation [here](https://github.com/skyscrapers/{os.getenv('REPO_NAME')}/wiki/modules-documentation#{module_name})\n"
-    return content
 
 def process_directory(directory, config):
     json_content = download_bucket(directory)
@@ -158,10 +153,7 @@ def process_directory(directory, config):
 
     if markdown_content:
         directory = directory.split('/', 1)[1]
-        markdown_content = f"## {directory.capitalize()}\n\n"
-        if directory in MODULES_NAME:
-            markdown_content += create_link_to_module_doc(directory)
-        markdown_content += markdown_content
+        markdown_content = f"## {directory.capitalize()}\n\n" + markdown_content
 
     return markdown_content
 
@@ -218,8 +210,9 @@ if __name__ == "__main__":
     directories = [d for d in os.listdir(os.getcwd()) if os.path.isdir(os.path.join(os.getcwd(), d))]
     for directory in directories:
         process_environment(directory, config, args.output_dir)
-    
+
     md_files = list_md_files(args.output_dir)
     create_modules_documentation(args.output_dir)
     md_files += list_md_files(args.output_dir)
+    os.chdir("../..")
     copy_wiki(md_files)
