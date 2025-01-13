@@ -45,16 +45,18 @@ def create_str_for_multiple_modules(paths, module_name, module_full_name):
     return content
 
 def create_modules_documentation(output_dir):
-    modules_dir = 'terraform/modules'
+    modules_dir = '../modules'
     markdown_content = ""
     paths = []
+    print("create module doc: ", os.getcwd())
     directory_names = [d for d in os.listdir(modules_dir) if os.path.isdir(os.path.join(modules_dir, d))]
     multiple_directory = compare_directory_names(directory_names)
     if multiple_directory is not None:
         for module in multiple_directory:
             paths.append(process_files(modules_dir, module[0]))
             paths.append(process_files(modules_dir, module[1]))
-    markdown_content += create_str_for_multiple_modules(paths, multiple_directory[0][0].split('-')[0], multiple_directory[0][0])
+        paths_filtered = [path for path in paths if path is not None]
+        markdown_content += create_str_for_multiple_modules(paths_filtered, multiple_directory[0][0].split('-')[0], multiple_directory[0][0])
     directory_names = remove_module_from_list(directory_names, multiple_directory[0])
     for directory in directory_names:
         tmp = process_files(modules_dir, directory)
@@ -163,7 +165,9 @@ def process_directory(directory, config):
 
 def process_environment(environment, config, output_dir):
     markdown_content = ""
-    for root, dirs, files in os.walk(environment):
+    print("process environment: ", os.getcwd())
+    print("environment: ", environment)
+    for root, dirs, files in os.walk(f"{environment}"):
         if '.terragrunt-cache' in root:
             continue
 
@@ -180,7 +184,8 @@ def process_environment(environment, config, output_dir):
                         markdown_content += content
 
     if markdown_content.strip() != f"# {environment.capitalize()} Environment\n\n":
-        output_file = os.path.join(output_dir, f"{environment.capitalize()}-environment.md")
+        print(os.getcwd())
+        output_file = f"{output_dir}/{environment.capitalize()}-environment.md"
         os.makedirs(output_dir, exist_ok=True)
         with open(output_file, 'w') as f:
             f.write(markdown_content)
@@ -215,7 +220,6 @@ if __name__ == "__main__":
         process_environment(directory, config, args.output_dir)
     
     md_files = list_md_files(args.output_dir)
-    os.chdir("../..")
     create_modules_documentation(args.output_dir)
     md_files += list_md_files(args.output_dir)
     copy_wiki(md_files)
