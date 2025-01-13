@@ -4,8 +4,75 @@ import json
 import boto3
 import argparse
 import subprocess
+from collections import defaultdict
 
-TEMP_DIR = 'temp_wiki'
+MODULES_NAME = []
+
+def compare_directory_names(directory_names):
+    # Create a defaultdict to store matching directory groups
+    grouped_directories = defaultdict(list)
+    
+    # Iterate through each directory name and extract the base directory name
+    for directory in directory_names:
+        parts = directory.split('-')
+        base_name = parts[0]  # Assume the base directory name is the last part
+        grouped_directories[base_name].append(directory)
+    
+    # Create the result list in the required format
+    matching_directories = [{base_name: dirs} for base_name, dirs in grouped_directories.items()]
+    return matching_directories
+
+
+def process_files(module_dir, directory):
+    files = os.listdir(f"{module_dir}/{directory}")
+    for file in files:
+        if file.endswith('.md'):
+            return f"{module_dir}/{directory}/{file}"
+        
+def remove_module_from_list(module_list, module_to_remove):
+    clean_least = [i for i in module_list if i not in module_to_remove]
+    return clean_least
+
+def create_str_for_multiple_modules(paths, module_name, module_full_name):
+    content = ""
+    print(module_name)
+    if any(paths):
+      content += f"## {module_name.capitalize()}\n\n"
+    for index, path in enumerate(paths):
+        if path != None:
+          with open(path, 'r') as f:
+              tmp = f.read()
+              if tmp.strip():
+                  content += f"### {module_full_name[index].capitalize()}\n\n"
+                  tmp = tmp.replace("# ", "#### ",)
+                  content += tmp
+    MODULES_NAME.append(module_name)
+    return content
+
+def create_modules_documentation(output_dir):
+    modules_dir = '../modules'
+    markdown_content = ""
+
+    output_file = os.path.join(output_dir, f"modules-documentation.md")
+    os.makedirs(output_dir, exist_ok=True)
+
+    directory_names = [d for d in os.listdir(modules_dir) if os.path.isdir(os.path.join(modules_dir, d))]
+    multiple_directory = compare_directory_names(directory_names)
+
+    for modules in multiple_directory:
+      paths = []
+      for module, directories in modules.items():
+          for directory in directories:
+              paths.append(process_files(modules_dir, directory))
+      
+
+      if paths.__len__() > 1:
+        print(paths, module, directories)
+        markdown_content += create_str_for_multiple_modules(paths, module, directories)
+
+      with open(output_file, 'w') as f:
+          f.write(markdown_content)
+      print(f"Markdown file generated for module: {module}")
 
 def load_config(config_file):
     with open(config_file, 'r') as f:
@@ -60,7 +127,6 @@ def extract_repo_name(file_path):
     
 def download_bucket(directory):
     s3 = boto3.client('s3')
-    print(f"directory = ", directory)
     bucket_name = "terraform-remote-state-" + extract_repo_name("terragrunt.hcl")
     try:
         s3.download_file(bucket_name, directory, "tmp_file.json")
@@ -93,7 +159,7 @@ def process_directory(directory, config):
 
 def process_environment(environment, config, output_dir):
     markdown_content = ""
-    for root, dirs, files in os.walk(environment):
+    for root, dirs, files in os.walk(f"{environment}"):
         if '.terragrunt-cache' in root:
             continue
 
@@ -106,11 +172,12 @@ def process_environment(environment, config, output_dir):
                 with open(os.path.join(root, file), 'r') as f:
                     content = f.read()
                     if content.strip():
-                        markdown_content += f"### Docs\n\n"
+                        markdown_content += f"\n### Docs\n\n"
                         markdown_content += content
 
     if markdown_content.strip() != f"# {environment.capitalize()} Environment\n\n":
-        output_file = os.path.join(output_dir, f"{environment.capitalize()}-environment.md")
+        print(os.getcwd())
+        output_file = f"{output_dir}/{environment.capitalize()}-environment.md"
         os.makedirs(output_dir, exist_ok=True)
         with open(output_file, 'w') as f:
             f.write(markdown_content)
@@ -145,5 +212,7 @@ if __name__ == "__main__":
         process_environment(directory, config, args.output_dir)
 
     md_files = list_md_files(args.output_dir)
+    create_modules_documentation(args.output_dir)
+    md_files += list_md_files(args.output_dir)
     os.chdir("../..")
     copy_wiki(md_files)
