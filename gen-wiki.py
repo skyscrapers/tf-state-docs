@@ -127,7 +127,7 @@ def extract_repo_name(file_path):
     
 def download_bucket(directory):
     s3 = boto3.client('s3')
-    bucket_name = "terraform-remote-state-" + extract_repo_name("terragrunt.hcl")
+    bucket_name = "terraform-remote-state-" + extract_repo_name("root.hcl")
     try:
         s3.download_file(bucket_name, directory, "tmp_file.json")
         return "tmp_file.json"
