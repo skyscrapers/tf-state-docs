@@ -212,7 +212,10 @@ if __name__ == "__main__":
         process_environment(directory, config, args.output_dir)
 
     md_files = list_md_files(args.output_dir)
-    create_modules_documentation(args.output_dir)
-    md_files += list_md_files(args.output_dir)
+    try :
+        create_modules_documentation(args.output_dir)
+        md_files += list_md_files(args.output_dir)
+    except Exception as e:
+        print(f"Error creating modules documentation: {e}")
     os.chdir("../..")
     copy_wiki(md_files)
