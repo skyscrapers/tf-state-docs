@@ -198,8 +198,8 @@ def copy_wiki(md_files):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Extract secrets using terragrunt state pull based on a YAML configuration.')
-    parser.add_argument('config_file', default='/config.yml', help='Path to the YAML configuration file')
-    parser.add_argument('output_dir', default='output/', help='Path to the output directory')
+    parser.add_argument('--config_file', default='config.yml', help='Path to the YAML configuration file')
+    parser.add_argument('--output_dir', default='output/', help='Path to the output directory')
     parser.add_argument('--repo_name', default=os.getenv("REPO_NAME"), help='Name of the repo you want to create a doc for')
     parser.add_argument('--shared_dir', default='shared', help='Directory for shared resources')
 
